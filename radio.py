@@ -34,14 +34,15 @@ class Radio():
 
     def stop(self):
         print('stop')
-        self.mplayer.terminate()
-        self.mplayer.wait()
+        if hasattr(self,'mplayer'):
+            self.mplayer.terminate()
+            self.mplayer.wait()
 
     def print_channel(self):
         print(self.history)
 
     def add_history(self):
-        if len(self.history)>=3:
+        if len(self.history)>=8:
             self.del_last_history()
         self.history.append([self.channel,self.stream])
 
@@ -117,14 +118,17 @@ def bmute():
         mutestate = True
 
 def history_window():
-    window = tkinter.Toplevel()
+    quit
+    window = tkinter.Toplevel(top)
     history_string=""
     for s in radio.history:
-        history_string+=s[0]+'\n'
-    history_string = history_string[:-1]
+        history_string+=s[0]+'\n'+s[1]+'\n'+'\n'
+    history_string = history_string[:-2]
     history_var.set(history_string)
     history_label = tkinter.Label(window,textvariable=history_var).pack()
-    
+
+def quit():
+    self.root.destroy()
 
 main_var=tkinter.StringVar()
 label = tkinter.Label(top,textvariable=main_var)
