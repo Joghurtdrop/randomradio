@@ -34,9 +34,11 @@ class Radio():
 
     def stop(self):
         print('stop')
-        if hasattr(self,'mplayer'):
+        try:
             self.mplayer.terminate()
             self.mplayer.wait()
+        except:
+            pass
 
     def print_channel(self):
         print(self.history)
@@ -77,26 +79,19 @@ def bstop():
     start.configure(state='normal')
     stop.configure(state='disable')
     radio.stop()
-    global state
-    state = False
+    stoptimer()
 
 def bstart():
     start.configure(state='disable')
     stop.configure(state='normal')
-    global state
-    state = True
-    global timer
-    timer = [0,0,0]
-    timelabel.configure(text='00:00:00')
+    starttimer()
     radio.start()
     main_var.set(radio.channel)
 
 def bforward():
     start.configure(state='disable')
     stop.configure(state='normal')
-    global timer
-    timer = [0,0,0]
-    timelabel.configure(text='00:00:00')
+    starttimer()
     radio.stop()
     time.sleep(1)
     radio.start()
@@ -106,6 +101,17 @@ def bforward():
         mutestate = False
         bmute()
     main_var.set(radio.channel)
+
+def stoptimer():
+    global state
+    state = False
+
+def starttimer():
+    global state
+    state = True
+    global timer
+    timer = [0,0,0]
+    timelabel.configure(text='00:00:00')
 
 def bmute():
     radio.mplayer.stdin.write(b'mute\n')
@@ -118,7 +124,11 @@ def bmute():
         mutestate = True
 
 def history_window():
-    quit
+    global window
+    try:
+        window.destroy()
+    except:
+        pass
     window = tkinter.Toplevel(top)
     history_string=""
     for s in radio.history:
@@ -127,12 +137,16 @@ def history_window():
     history_var.set(history_string)
     history_label = tkinter.Label(window,textvariable=history_var).pack()
 
-def quit():
-    self.root.destroy()
+def quitit():
+    radio.mplayer.terminate()
+    top.quit()
 
 main_var=tkinter.StringVar()
 label = tkinter.Label(top,textvariable=main_var)
 label.pack()
+
+window = tkinter.Toplevel(top)
+window.destroy()
 
 history_var=tkinter.StringVar()
 
@@ -159,6 +173,8 @@ history.pack()
 stop = tkinter.Button(top,text='Stoppe',command=bstop)
 stop.pack()
 
+quit = tkinter.Button(top,text='Quit',command=quitit)
+quit.pack()
 
 timeclock()
 top.mainloop()
