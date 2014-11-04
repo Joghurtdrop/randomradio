@@ -8,7 +8,7 @@ import tkinter
 class Radio():
     def __init__(self):
         self.channel='Noch nichts gehoert'
-        self.history = []
+        self.history = [['Ich bin Ihr erster Sender :D','und ich der erste Link :p']]
 
     def getstream(self):
         seite = random.randrange(1,655)
@@ -118,16 +118,19 @@ def bmute():
 
 def history_window():
     window = tkinter.Toplevel()
-    history_var.set(radio.history)
-    history_label = tkinter.Label(window,textvariable=history_var)
-    label.pack()
+    history_string=""
+    for s in radio.history:
+        history_string+=s[0]+'\n'
+    history_string = history_string[:-1]
+    history_var.set(history_string)
+    history_label = tkinter.Label(window,textvariable=history_var).pack()
+    
 
 main_var=tkinter.StringVar()
 label = tkinter.Label(top,textvariable=main_var)
 label.pack()
 
 history_var=tkinter.StringVar()
-
 
 state = False
 timer = [0,0,0]
