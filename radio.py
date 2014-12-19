@@ -70,6 +70,10 @@ def timeclock():
         if(timer[1] >= 60):
             timer[1] = 0
             timer[0]+= 1
+        
+        if timerstate:
+            if(timer[1] >= 15):
+                bforward()
 
         timestring = pattern.format(timer[0],timer[1],timer[2])
         timelabel.configure(text=timestring)
@@ -138,8 +142,18 @@ def history_window():
     history_label = tkinter.Label(window,textvariable=history_var).pack()
 
 def quitit():
-    radio.mplayer.terminate()
+    radio.stop()
     top.quit()
+
+def bnexttimer():
+    global timerstate
+    if timerstate:
+        nexttimer.configure(relief='raised')
+        timerstate = False
+    else:
+        nexttimer.configure(relief='sunken')
+        timerstate = True
+
 
 main_var=tkinter.StringVar()
 label = tkinter.Label(top,textvariable=main_var)
@@ -160,6 +174,10 @@ timelabel.pack()
 mutestate = False
 mutebutton = tkinter.Button(top,text='Mute',command=bmute)
 mutebutton.pack()
+
+timerstate= True
+nexttimer = tkinter.Button(top,text='15min Timer',command=bnexttimer,relief='sunken')
+nexttimer.pack()
 
 forward = tkinter.Button(top,text='Forward',command=bforward)
 forward.pack()
