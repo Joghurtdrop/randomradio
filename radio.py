@@ -149,9 +149,11 @@ def bnexttimer():
     global timerstate
     if timerstate:
         nexttimer.configure(relief='raised')
+        forward.configure(state='normal')
         timerstate = False
     else:
         nexttimer.configure(relief='sunken')
+        forward.configure(state='disable')
         timerstate = True
 
 
@@ -179,7 +181,7 @@ timerstate= True
 nexttimer = tkinter.Button(top,text='15min Timer',command=bnexttimer,relief='sunken')
 nexttimer.pack()
 
-forward = tkinter.Button(top,text='Forward',command=bforward)
+forward = tkinter.Button(top,text='Forward',state='disable',command=bforward)
 forward.pack()
 
 start = tkinter.Button(top,text='Starte',command=bstart)
