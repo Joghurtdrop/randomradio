@@ -2,7 +2,7 @@ import subprocess
 import random
 import time
 import re
-import urllib.request
+import httplib2
 import tkinter
 
 class Radio():
@@ -11,20 +11,25 @@ class Radio():
         self.history = [['Ich bin Ihr erster Sender :D','und ich der erste Link :p']]
 
     def getstream(self):
-        seite = random.randrange(1,655)
-        url = urllib.request.urlopen('http://www.radio.de/sender/{0}'.format(seite)).read()
-        urlPat = re.compile(b'href=\"http\:\/\/.*.radio.de\"')
-        result = [i.decode('utf-8') for i in re.findall(urlPat,url)]
-        result.pop(0)
-        for i in range(len(result)):
-            result[i]=result[i][13:-1]
-        
-        self.channel=random.choice(result)
-        url2 = urllib.request.urlopen('http://{0}'.format(self.channel)).read()
-        urlPat2 = re.compile(b'"stream":"[^\"]*')
-        result2 = [i.decode('utf-8') for i in re.findall(urlPat2,url2)]
-        result2 = result2[0][10:]
-        self.stream=result2
+        h = httplib2.Http(".cache")
+        # Genres holen
+        resp, page = h.request('http://www.radio.de', 'GET')
+        genrePat = re.compile(b'href=\"\/genre\/.*\/\"')
+        genreUrls = [i.decode('utf-8') for i in re.findall(genrePat,page)]
+        genreUrls = ['http://www.radio.de' + i[6:-1] for i in genreUrls]
+        genre = random.choice(genreUrls)
+        print(genre)
+        resp, page = h.request(genre, 'GET')
+        # Nutz nur die erste Seite des Genres
+        channelPat = re.compile(b'\/\/[^.]*.radio.de\" class=\"stationinfo-link\"')
+        channels = [i.decode('utf-8') for i in re.findall(channelPat, page)]
+        channels = ['http:' + i[:-26] for i in channels]
+        # Die Radioseite öffnen und Stream holen
+        self.channel=random.choice(channels)
+        resp, page = h.request(self.channel, 'GET')
+        streamPat = re.compile(b'\"streamUrl\":\"[^\"]*\"')
+        self.stream = [i.decode('utf-8') for i in re.findall(streamPat, page)][0][13:-1]
+        print(self.stream)
 
     def start(self):
         print('start')
