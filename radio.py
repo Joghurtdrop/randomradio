@@ -18,15 +18,15 @@ class Radio():
         genreUrls = [i.decode('utf-8') for i in re.findall(genrePat,page)]
         genreUrls = ['http://www.radio.de' + i[6:-1] for i in genreUrls]
         genre = random.choice(genreUrls)
+        genre = genre.replace(' ','%20')
         print(genre)
         resp, page = h.request(genre, 'GET')
         # Nutz nur die erste Seite des Genres
-        sitePat = re.compile(b'<li><a href="\?.*')
+        sitePat = re.compile(b'<li><a href="\?.*">')
         sites = [i.decode('utf-8') for i in re.findall(sitePat,page)]
-        sites = [genre+'?p=1']+[genre + i[13:-1] for i in sites]
+        sites = [genre+'?p=1']+[genre + i[13:-2] for i in sites]
         localsite = random.choice(sites)
         resp, page = h.request(localsite, 'GET')
-
         channelPat = re.compile(b'\/\/[^.]*.radio.de\" class=\"stationinfo-link\"')
         channels = [i.decode('utf-8') for i in re.findall(channelPat, page)]
         channels = ['http:' + i[:-26] for i in channels]
